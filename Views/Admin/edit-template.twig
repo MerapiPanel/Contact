@@ -7,19 +7,13 @@
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.1/dist/quill.snow.css" rel="stylesheet" />
 {% endblock %}
 
-{% block header_title %}Add Contact Template{% endblock %}
-
-{% block breadcrumb_item %}
-<li class="breadcrumb-item"><a href="{{ '/' | access_path }}">Home</a></li>
-<li class="breadcrumb-item"><a href="{{ '/contact' | access_path }}">Contact</a></li>
-<li class="breadcrumb-item"><a href="{{ '/contact/template' | access_path }}">Template</a></li>
-<li class="breadcrumb-item active" aria-current="page">Add</li>
-{% endblock %}
+{% block header_title %}Edit Contact Template{% endblock %}
 
 {% block subheader_outer %}{% endblock %}
 
 {% block content %}
 <form class="needs-validation" method="POST" xhr-action="{{ '/api/Contact/Template/update' | access_path }}">
+    {{csrf_input()}}
     <input type="hidden" name="id" value="{{ template.id }}">
     <div class="row p-3">
         <div class="col-12">
@@ -149,9 +143,7 @@
         email: '<i class="fas fa-envelope fa-lg"></i>',
         whatsapp: '<i class="fab fa-whatsapp fa-lg"></i>'
     }
-    const contacts = JSON.parse('{{ _box.Contact.fetchAll | json_encode | raw }}');
-
-
+    const contacts = {{_box.Contact.fetchAll|json_encode|raw}};
 
     $('#template').html(templates["{{ template.contact.type }}"]);
     if ("{{ template.contact.type }}" == "email") {

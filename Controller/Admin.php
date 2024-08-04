@@ -66,7 +66,7 @@ class Admin extends __Controller
 
 	function addTemplate()
 	{
-		return View::render("add-template.twig");
+		return View::render("admin/add-template.twig");
 	}
 
 	function editTemplate(Request $request)
@@ -80,7 +80,7 @@ class Admin extends __Controller
 			throw new \Exception("Template not found", 404);
 		}
 
-		return View::render("edit-template.twig", [
+		return View::render("admin/edit-template.twig", [
 			"template" => $template
 		]);
 	}

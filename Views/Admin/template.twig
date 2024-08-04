@@ -1,17 +1,5 @@
 {% extends "@panel/base.html.twig" %}
-
-
-
 {% block header_title %}Contact Template{% endblock %}
-
-
-{% block breadcrumb_item %}
-<li class="breadcrumb-item"><a href="{{ '/' | access_path }}">Home</a></li>
-<li class="breadcrumb-item"><a href="{{ '/contact' | access_path }}">Contact</a></li>
-<li class="breadcrumb-item active" aria-current="page">Template</li>
-{% endblock %}
-
-
 {% block subheader_search %}
 <select class="form-select border-0" name="filter" id="filter-contact" style="box-shadow: none;">
 	<option value="">-- Filter --</option>
@@ -33,7 +21,6 @@
 {% set total = _box.Contact.template.count %}
 
 {% block content %}
-
 <div class="row">
 	<div class="col-12 col-lg-7">
 		<ul class="list-group list-group-flush px-2 py-1" id="template-list">
@@ -55,7 +42,8 @@
 	__.Contact.Template = "CreateProperty";
 	__.Contact.on("property:Template", function () {
 		__.Contact.Template.fetchURL = "{{ '/api/Contact/Template/fetchAll' | access_path }}";
-	})
+	});
+	__.Contact.csrf_token = "{{csrf_token()}}";
 	
 </script>
 <script src="{{ '@contact/dist/template.js' | assets }}?v={{ time() }}"></script>
@@ -78,9 +66,10 @@
 			return;
 		}
 		return new Promise(function (resolve, reject) {
-			__.dialog.confirm('Are you sure?', `Are you sure you want to delete <b>${item.name}</b>?`)
+			
+			__.dialog.danger('<h6 class="text-danger">Are you sure?</h6>', `Are you sure you want to delete <b>${item.name}</b>?`)
 				.then(function () {
-					__.http.post("{{ '/api/Contact/Template/delete' | access_path }}", { id: item.id })
+					__.http.post("{{ '/api/Contact/Template/delete' | access_path }}", { id: item.id, csrf_token: __.Contact.csrf_token})
 						.then(function (response) {
 							resolve();
 						})

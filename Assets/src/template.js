@@ -8,7 +8,8 @@ const icons = {
     whatsapp: `<i class="fa-brands fa-whatsapp me-2"></i>`
 }
 const payload = {
-    type: $("#filter-contact").val() || null
+    type: $("#filter-contact").val() || null,
+    "csrf_token": __.Contact.csrf_token
 }
 
 const roles = {
@@ -91,15 +92,5 @@ template.edit = (item) => {
 
 
 template.delete = (item) => {
-    __.dialog.confirm("Are you sure?", `Are you sure you want to delete <b>${item.name}</b>?`)
-        .then(function () {
-            template.fire('delete', item)
-                ?.then(() => {
-                    __.toast("Template deleted successfully", 5, 'text-success');
-                    template.render();
-                })
-                .catch(function (error) {
-                    __.toast(error.message || "Something went wrong", 5, 'text-danger');
-                });
-        });
+    template.fire('delete', item)?.then(() => template.render())
 }

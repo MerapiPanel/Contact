@@ -1,23 +1,16 @@
 {% extends "@panel/base.html.twig" %}
-
 {% block header_title %}Add Contact Template{% endblock %}
-
-{% block breadcrumb_item %}
-<li class="breadcrumb-item"><a href="{{ '/' | access_path }}">Home</a></li>
-<li class="breadcrumb-item"><a href="{{ '/contact' | access_path }}">Contact</a></li>
-<li class="breadcrumb-item"><a href="{{ '/contact/template' | access_path }}">Template</a></li>
-<li class="breadcrumb-item active" aria-current="page">Add</li>
-{% endblock %}
 
 {% block subheader_outer %}{% endblock %}
 
 {% block content %}
-<form class="needs-validation" method="POST" xhr-action="{{ '/api/Contact/Template/add' | access_path }}">
+<form class="needs-validation" method="POST" xhr-action="{{'/api/Contact/Template/add'|access_path}}" id="addContactTemplate">
+    {{csrf_input()}}
     <div class="row p-3">
         <div class="col-12">
             <div class="form-group mb-3">
                 <label for="name">Name :</label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="Enter name" required>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Enter name" pattern="[a-zA-Z]{2}(\s|\w+)" required>
             </div>
         </div>
         <div class="col-12">
@@ -41,7 +34,6 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>
     </div>
-
 </form>
 {% endblock %}
 
@@ -50,21 +42,24 @@
 {{ parent() }}
 <script>
 
-
-    $("form").on("xhr-submit", function (e) {
-        if ($("#contact-id").val() == "") {
-            __.toast("Please select a contact", 5, "text-danger");
-            e.stopImmediatePropagation();
-            e.preventDefault();
-        }
-    }).on("xhr-success", function (e) {
-        __.toast("Template added successfully", 5, "text-success");
-        setTimeout(() => {
-            window.location.href = "{{ '/contact/template' | access_path }}";
-        }, 300);
-    }).on("xhr-error", function (e) {
-        __.toast("Something went wrong", 5, "text-danger");
-    })
+    $("form#addContactTemplate")
+        .on("xhr-submit", function (e) {
+            console.log($("#contact-id").val())
+            if ($("#contact-id").val() == "") {
+                __.toast("Please select a contact", 5, "text-danger");
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+        })
+        .on("xhr-success", function (e) {
+            __.toast("Template added successfully", 5, "text-success");
+            setTimeout(() => {
+                window.location.href = "{{ '/contact/template' | access_path }}";
+            }, 300);
+        })
+        .on("xhr-error", function (e) {
+            __.toast("Something went wrong", 5, "text-danger");
+        })
 
 
 
@@ -102,7 +97,7 @@
         email: '<i class="fas fa-envelope fa-lg"></i>',
         whatsapp: '<i class="fab fa-whatsapp fa-lg"></i>'
     }
-    const contacts = JSON.parse('{{ _box.Contact.fetchAll | json_encode | raw }}');
+    const contacts = {{ _box.Contact.fetchAll| json_encode | raw}};
 
     $('#contact').on("click", function () {
         contactSelection()
@@ -117,13 +112,12 @@
     });
 
     function contactSelection() {
-        const contents = $(`<div class="list-group list-group-flush scrollbar-sm">`)
-            .css({
-                height: "75vh",
-                overflow: "auto",
-            })
+
+        const contents = $(`<div class="list-group list-group-flush scrollbar-sm">`).css({ height: "75vh", overflow: "auto" });
         const modal = $("#modal-contact").length ? __.modal.from($("#modal-contact")) : __.modal.create("Select Contact", contents);
+
         modal.el.prop('id', 'modal-contact');
+
         $(modal.el).find('.list-group').html("")
             .append(
                 contacts.filter(e => e.type != 'phone').map(contact => {
@@ -146,6 +140,11 @@
                     )
                 })
             )
+        if (!contacts.filter(e => e.type != 'phone').length) {
+            $(modal.el).find('.list-group').html("").append(
+                $(`<div class='fs-4 flex-grow-1 d-flex align-items-center justify-content-center text-center text-warning flex-column'><i class="fa-2x fa-solid fa-file-circle-question"></i> No contact found that meets requirements</div>`)
+            )
+        }
         modal.show();
 
         return new Promise(resolve => {

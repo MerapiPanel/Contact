@@ -75,6 +75,7 @@ const roles = {
 
 const payload = {
     "contact-type": $("#filter-contact").val() || null,
+    "csrf_token": contact.csrf_token
 }
 
 $("#filter-contact").on("change", function () {
@@ -252,7 +253,6 @@ contact.edit = function (data) {
 contact.delete = function (data) {
 
     const content = `Are you sure you want to delete <b>${data.name}</b>?`;
-
     __.dialog.danger("Are you sure ?", content)
         .then(function () {
             contact.fire('delete', data)
